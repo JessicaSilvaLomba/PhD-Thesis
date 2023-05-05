@@ -1,5 +1,6 @@
 ####################################################
 #    Automatic L-moment Ration Selection Method    #
+#      cf. Silva Lomba and Fraga Alves (2020)      # 
 ####################################################
 
 #import L-moments estimators
