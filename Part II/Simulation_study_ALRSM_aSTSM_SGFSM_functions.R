@@ -244,8 +244,6 @@ run_sim_ATS<-function(distribution, method, B, n, xi, true_u, probs, seed) {
     rm(choice)
   }
   
-  end.time <- Sys.time()
-  
   u_med<-mean(u_opt[is.na(u_opt)==F])
   RMSE_u_opt<-sqrt(mean((u_opt[is.na(u_opt)==F]-true_u)^2))
   
@@ -263,6 +261,8 @@ run_sim_ATS<-function(distribution, method, B, n, xi, true_u, probs, seed) {
   RMSE_0.01<-sqrt(mean((Q_0.01_est[is.na(Q_0.01_est)==F]-Q_0.01_true)^2))
   RMSE_0.001<-sqrt(mean((Q_0.001_est[is.na(Q_0.001_est)==F]-Q_0.001_true)^2))
   RMSE_0.0001<-sqrt(mean((Q_0.0001_est[is.na(Q_0.0001_est)==F]-Q_0.0001_true)^2))
+  
+  end.time <- Sys.time()
   
   ## Reporting the results
   if(distribution == "gev"){
