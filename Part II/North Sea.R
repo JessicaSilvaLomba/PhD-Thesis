@@ -17,7 +17,7 @@ library(spatialEco)
 library(SpatialExtremes)
 
 # import L-moments estimators
-source('Sample L-Moments.R')
+source('Sample_L-Moments.R')
 # import source code for STSM - Northrop and Coleman (2014) 
 source("NorthropColeman2014.fns")
 
