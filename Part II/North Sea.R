@@ -321,7 +321,7 @@ if(length(northrop)==10){
   Nu_opt_N<-NA
 }
 
-# add info to p-values plot - Figure 3.11
+# add info to p-values plot - Figure 3.13
 abline(v=u_opt_N,col='red',lty=2)
 #text(floor(u_opt_N),1,u_opt_N, col='red')
 text(3.2,1,u_opt_N, col='red')
