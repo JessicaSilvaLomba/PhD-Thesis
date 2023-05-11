@@ -4,7 +4,7 @@
 ####################################################
 
 # import L-moments estimators
-source('Sample L-Moments.R')
+source('Sample_L-Moments.R')
 
 # 'data' - your array of iid observations
 x<-sort(data)
