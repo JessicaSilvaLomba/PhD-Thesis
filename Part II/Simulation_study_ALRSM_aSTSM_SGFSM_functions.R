@@ -14,7 +14,7 @@ library(evir)
 library(eva)
 
 # import L-moments estimators
-source('Sample L-Moments.R')
+source('Sample_L-Moments.R')
 
 # import hybrid random generator
 source('rhybrid.R')
