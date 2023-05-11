@@ -323,8 +323,7 @@ if(length(northrop)==10){
 
 # add info to p-values plot - Figure 3.13
 abline(v=u_opt_N,col='red',lty=2)
-#text(floor(u_opt_N),1,u_opt_N, col='red')
-text(3.2,1,u_opt_N, col='red')
+text(floor(u_opt_N),1,u_opt_N, col='red')
 
 #alternative automatic selection rule
 u_opt_N_alt<-u[which(northrop$e.p.values > 0.05)][1]
