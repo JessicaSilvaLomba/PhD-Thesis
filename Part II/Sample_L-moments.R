@@ -68,6 +68,18 @@ l4<-function(x){
 }
 
 
+
+#estimator of L-skewness
+t3<-function(x){
+  return(l3(x)/l2(x))
+}
+
+#estimator of L-kurtosis
+t4<-function(x){
+  return(l4(x)/l2(x))
+}
+
+
 ##########################
 #    Sample L-Moments    #
 ##########################
