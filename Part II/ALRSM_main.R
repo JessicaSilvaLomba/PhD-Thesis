@@ -1,5 +1,5 @@
 ####################################################
-#    Automatic L-moment Ration Selection Method    #
+#    Automatic L-moment Ratio Selection Method     #
 #      cf. Silva Lomba and Fraga Alves (2020)      # 
 ####################################################
 
@@ -68,5 +68,5 @@ points(t3_line[i0_line],t4_line[i0_line],col="red",pch=20, cex=2)
 
 
 ####################################################
-#    Automatic L-moment Ration Selection Method    #
+#    Automatic L-moment Ratio Selection Method     #
 ####################################################
