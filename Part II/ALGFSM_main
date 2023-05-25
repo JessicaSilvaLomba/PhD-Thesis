@@ -1,0 +1,80 @@
+#################################################
+#    Automatic L-moment GoF Selection Method    #
+#    cf. Silva Lomba and Fraga Alves (2021b)    # 
+#################################################
+
+# work with Kappa
+library('lmom')
+library('homtest')
+
+# Theoretical GP tau4 as function of tau3
+tau.4<-function(tau.3){tau.3*(1+5*tau.3)/(5+tau.3)}
+
+
+# 'data' - your array of iid observations
+x<-sort(data)
+n<-length(x)
+
+
+u_opt<-Nu_opt<-NA
+B4<-sigma4<-Z_GPd<-p_val<-NA
+
+# candidate thresholds
+#u<- quantile(x,probs = seq(0.25,0.925,by=0.075), names=F)  #10 quantiles
+u<- quantile(x,probs = seq(0.25,0.953,by=0.037), names=F)  #20 quantiles
+
+
+I<-1:length(u)
+
+for (i in I) {
+  x_exc <- x[x > u[i]]   # exceedances of the current level
+  Xu=x_exc-u[i]          # corresponding excesses
+  nu<-length(Xu)
+  
+  lmom_Xu<-samlmu(Xu)
+  #lmom_Xu<-c(l1(Xu), l2(Xu), l3(Xu)/l2(Xu), l4(Xu)/l2(Xu))
+  
+  # computes the GPd parameters as function of the L-moments
+  par_GP_Xu<-pelgpa(lmom_Xu, bound=0)
+  tau_4_GP<-tau.4(lmom_Xu[[3]])
+  
+  # computes the Kappa parameters as function of the L-moments
+  par_Kappa_Xu<-tryCatch(pelkap(lmom_Xu), error= function (e) NA, warning = function(w) NA)
+  
+  # Kappa sample simulations
+  if(!is.na(par_Kappa_Xu[1])){
+    Nsim=500
+    m=1
+    sim_t<-matrix(nrow=Nsim,ncol=4)
+    for(m in 1:Nsim){
+      samp<-rand.kappa(length(Xu),par_Kappa_Xu[1],par_Kappa_Xu[2],par_Kappa_Xu[3],par_Kappa_Xu[4])
+      sim_t[m,]<-samlmu(samp)
+    }
+    
+    B4[i]<-sum(sim_t[,4]-lmom_Xu[[4]])/Nsim
+    
+    sigma4[i]<-sqrt((Nsim-1)^(-1)*(sum((sim_t[,4]-lmom_Xu[[4]])^2)-Nsim*B4[i]^2))
+    
+    Z_GPd[i]<-(tau_4_GP-lmom_Xu[[4]]+B4[i])/sigma4[i]
+    
+    p_val[i]<-2*min(pnorm(Z_GPd[i],lower.tail = T),pnorm(Z_GPd[i],lower.tail = F))
+    
+  }
+}
+
+# automatic selection
+FS<-eva::pSeqStop(p_val)$ForwardStop
+
+if(sum(!is.na(FS))>=1){
+  if(sum(FS[!is.na(FS)]<=0.05)!=0){
+    i0_fs<-which.max(u[FS[!is.na(FS)]<=0.05])+1
+    u_opt<-ifelse(i0_fs<=length(u),u[i0_fs], NA)
+  }
+  else{u_opt<-u[1]}
+  Nu_opt<-length(x[x>u_opt])}
+
+
+
+#################################################
+#    Automatic L-moment GoF Selection Method    #
+#################################################
