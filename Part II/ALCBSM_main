@@ -1,0 +1,126 @@
+#############################################################
+#    Automatic L-moment Confidence Band Selection Method    #
+#          cf. Silva Lomba and Fraga Alves (2021b)          # 
+#############################################################
+
+# import L-moments estimators
+source('Sample_L-Moments.R')
+# alows estimation of conditional variances
+source('L-moment Ratios Asymptotic Conditional Variances.R')
+
+# 'data' - your array of iid observations
+x<-sort(data)
+n<-length(x)
+
+
+iboth<-NA
+u_opt_both<-Nu_opt_both<-NA
+
+# candidate thresholds
+#u<- quantile(x,probs = seq(0.25,0.925,by=0.075), names=F)  #10 quantiles
+u<- quantile(x,probs = seq(0.25,0.953,by=0.037), names=F)  #20 quantiles
+
+
+STOP<-F
+i=1
+
+# sequentially test, for each candidate, if (t3,t4) is inside both bands
+# stop when true
+
+while ((!STOP) & i<=length(u)) {  
+  x_exc <- x[x > u[i]]   # exceedances of the current level
+  Xu=x_exc-u[i]          # corresponding excesses
+  nu<-length(Xu)
+  
+  tt3<-t3(Xu)
+  tt4<-t4(Xu)
+  
+  var_t4_tt3<-var_t4giventt3(Xu,nu)
+  g<-tau.4(tt3)
+  
+  if(tt4 > g-qnorm(0.975)*var_t4_tt3 & tt4 < g+qnorm(0.975)*var_t4_tt3){ #test t4 inside tau4|t3=t*
+    
+    var_t3_tt4<-var_t3giventt4(Xu,nu)
+    ginv<-tau.3(tt4)
+    STOP <- (tt3 > ginv-qnorm(0.975)*var_t3_tt4 & tt3 < ginv+qnorm(0.975)*var_t3_tt4) #test t3 inside tau3|t4=t*
+  }
+  
+  i=i+1
+}
+
+if(STOP==T){
+  iboth<-i-1
+  u_opt_both<-u[iboth]
+  Nu_opt_both<-length(x[x > u[iboth]])
+}
+
+print(c(iboth, u_opt_both, Nu_opt_both))
+
+
+
+# ---------------------------------------------
+# PLOT BANDS IN LMRD (IF NEEDED)
+
+# GPd theoretical curve & plot
+# cf. Figure 4.1
+tau.4<-function(tau.3){tau.3*(1+5*tau.3)/(5+tau.3)}
+curve(tau.4(x),0,0.6,xlab = expression(tau[3]), #might need to adjust the window
+      ylab = expression(tau[4]))
+abline(h=0,v=0,col="grey")
+
+
+
+tt3<-c();tt4<-c() 
+var_t4giventt3<-c()
+var_t3giventt4<-c()
+
+I<-1:length(u)
+
+for (i in I) {
+  (x_exc <- x[x > u[i]]) # exceedances of the current level
+  Xu=x_exc-u[i]          # corresponding excesses
+  nu<-length(Xu)
+  
+  # sample l-mom ratios for the current threshold
+  tt4[i]=t4(Xu)
+  tt3[i]=t3(Xu)
+  
+  
+  # estimated root variance with t4=tau.4(t3)
+  TT1<- T_mat_1(Xu)
+  #EVal_t4giventt3[i] <- tt4[i]  #this way the points would always fall inside
+  var_t4giventt3[i] <- sqrt(TT1[2,2] /nu ) * sqrt(1-(TT1[1,2]^2/(TT1[1,1]*TT1[2,2])))
+  
+  # estiamted root variance with t3= tau.3(t4)
+  TT2<- T_mat_2(Xu)
+  var_t3giventt4[i] <- sqrt(TT2[1,1] /nu ) * sqrt(1-(TT2[1,2]^2/(TT2[1,1]*TT2[2,2])))
+  
+  rm(x_exc)
+  rm(Xu)
+}
+
+
+# add sequence of sample l-mom ratios to the plot
+lines(tt3[I],tt4[I], type="p",col="navy") #, pch=20)
+
+
+# 95% Confidence Intervals for tau4 given t3  
+
+
+# ESTIMATED Variance with t3 and t4=tau.4(t3)
+lines(tt3,tau.4(tt3)+qnorm(0.975)*var_t4giventt3, type="l", lty= 2 ,col="orange") 
+lines(tt3,tau.4(tt3)+qnorm(0.025)*var_t4giventt3, type="l", lty= 2 ,col="orange")
+
+
+# ESTIMATED Variance with t4 and t3=tau.3(t4)
+lines(tau.3(tt4[I])+qnorm(0.975)*var_t3giventt4, tt4[I], type="l", lty= 2 ,col="green") 
+lines(tau.3(tt4[I])+qnorm(0.025)*var_t3giventt4, tt4[I], type="l", lty= 2 ,col="green")
+
+# mark automatic choice 
+points(tt3[iboth],tt4[iboth],col="red",pch=20, cex=1.1)
+
+
+
+#############################################################
+#    Automatic L-moment Confidence Band Selection Method    #
+#############################################################
