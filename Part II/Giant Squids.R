@@ -23,7 +23,6 @@ source('L-moment Ratios Asymptotic Conditional Variances.R')
 
 
 
-
 #--- FUNCTIONS
 # Intergral of E_n statistic - Dietrich et al 2002, by Husler and Li 2006
 
