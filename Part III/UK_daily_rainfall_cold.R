@@ -1203,13 +1203,15 @@ threshold <- X[N-k]
 # 
 # #setup parallel backend to use many processors
 # cores=detectCores()
-# cl <- makeCluster(cores[1]-1) #not to overload your computer
+# cl <- makeCluster(cores[1]-1, outfile="log.txt") #not to overload your computer
 # registerDoParallel(cl)
 # 
 # tic()
-# se <- foreach(i=kmin:kmax, .combine=cbind) %dopar% {
-#   se_temp = EVI_Mix_Mom_StDv(i, Est[i])
-#   se_temp #Equivalent to se = cbind(se,se_temp)
+# se <- foreach(i=kmin:kmax, .combine=cbind, .errorhandling = "remove", .verbose = F, .inorder=F) %dopar% {
+#    #sink("log.txt",append=TRUE) #creates log file 
+#    se_temp = EVI_Mix_Mom_StDv(i, Est[i])
+#    print(paste("k=",i,"Est=",se_temp))
+#    c(i,se_temp) #Equivalent to se = cbind(se,se_temp)
 # }
 # toc()
 # 
